@@ -30,13 +30,28 @@ document.addEventListener('DOMContentLoaded', function() {
         ? localStorage.getItem('showSeconds') === 'true' 
         : true;
     
-    // Add seconds toggle button to the UI
+    // Load dark mode preference from localStorage or default to system preference
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    let darkMode = localStorage.getItem('darkMode') !== null
+        ? localStorage.getItem('darkMode') === 'true'
+        : prefersDarkScheme;
+    
+    // Apply initial theme
+    if (darkMode) {
+        document.body.classList.add('dark-mode');
+    }
+    
+    // Add controls (seconds toggle and dark mode toggle)
     const controlsDiv = document.createElement('div');
     controlsDiv.className = 'controls';
     controlsDiv.innerHTML = `
         <label class="toggle-container">
             <input type="checkbox" id="show-seconds-toggle" ${showSeconds ? 'checked' : ''}>
             <span class="toggle-label">Show Seconds</span>
+        </label>
+        <label class="toggle-container">
+            <input type="checkbox" id="dark-mode-toggle" ${darkMode ? 'checked' : ''}>
+            <span class="toggle-label">Dark Mode</span>
         </label>
     `;
     
@@ -50,6 +65,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // Save preference to localStorage
         localStorage.setItem('showSeconds', showSeconds);
         updateAllClocks(); // Update all clocks immediately to reflect the change
+    });
+    
+    // Add event listener for the dark mode toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    darkModeToggle.addEventListener('change', function() {
+        darkMode = this.checked;
+        // Save preference to localStorage
+        localStorage.setItem('darkMode', darkMode);
+        // Toggle dark mode class on body
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
     });
     
     // Populate timezone select
